@@ -1,41 +1,24 @@
-import type { MetaFunction } from "@remix-run/node";
+import {
+	unstable_createMemoryUploadHandler,
+	unstable_parseMultipartFormData,
+	type ActionFunctionArgs,
+} from '@remix-run/node';
+import { Form } from '@remix-run/react';
 
-export const meta: MetaFunction = () => {
-  return [
-    { title: "New Remix App" },
-    { name: "description", content: "Welcome to Remix!" },
-  ];
+export const action = async ({ request }: ActionFunctionArgs) => {
+	const formData = await unstable_parseMultipartFormData(
+		request,
+		unstable_createMemoryUploadHandler({ maxPartSize: 1024 * 1024 * 100 })
+	);
+	console.log(formData.get('file'));
+	return null;
 };
 
 export default function Index() {
-  return (
-    <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
-      <h1>Welcome to Remix</h1>
-      <ul>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/blog"
-            rel="noreferrer"
-          >
-            15m Quickstart Blog Tutorial
-          </a>
-        </li>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/jokes"
-            rel="noreferrer"
-          >
-            Deep Dive Jokes App Tutorial
-          </a>
-        </li>
-        <li>
-          <a target="_blank" href="https://remix.run/docs" rel="noreferrer">
-            Remix Docs
-          </a>
-        </li>
-      </ul>
-    </div>
-  );
+	return (
+		<Form encType='multipart/form-data' method='POST'>
+			<input type='file' accept='image/*' name='file' />
+			<button type='submit'>Submit</button>
+		</Form>
+	);
 }
